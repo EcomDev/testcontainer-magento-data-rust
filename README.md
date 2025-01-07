@@ -22,7 +22,7 @@ All the available Docker image version can be found in build repository [EcomDev
 
 Use cargo  with `--dev` flag to add it as dependency for your tests
 ```bash
-cargo add --dev 
+cargo add --dev testcontainers-magento-data
 ```
 
 
@@ -30,82 +30,34 @@ cargo add --dev
 
 ### MySQL container 
 
-Create Latest Magento Database Build
-```php
-use EcomDev\TestContainers\MagentoData\DbContainerBuilder;
+Run queries against Magento database build with sample data
 
-$container = DbContainerBuilder::mysql()
-    ->build();
-```
+```rust
+use sqlx::MySqlPool;
+use testcontainers_magento_data::runners::AsyncRunner;
+use testcontainers_magento_data::core::ImageBuilder;
+use testcontainers_magento_data::images::{DbConnection, DbContainer};
 
-Create Latest Magento Database Build with sample data
-```php
-use EcomDev\TestContainers\MagentoData\DbContainerBuilder;
+#[tokio::test]
+async fn starts_container_with_sample_data() {
+    let container = DbContainer::mariadb()
+        .with_sample_data()
+        .with_version("2.4.7-p2")
+        .start()
+        .await
+        .unwrap();
 
-$container = DbContainerBuilder::mysql()
-    ->withSampleData()
-    ->build();
-```
+    let connection = MySqlPool::connect(&container.connection_url().await.unwrap())
+        .await
+        .unwrap();
 
-Create 2.4.7-p2 with sample data and fetch number of products
-```php
-use EcomDev\TestContainers\MagentoData\DbContainerBuilder;
-use PDO;
+    let total: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM catalog_product_entity")
+        .fetch_one(&connection)
+        .await
+        .unwrap();
 
-$container = DbContainerBuilder::mysql()
-    ->withMagentoVersion('2.4.7-p2')
-    ->withSampleData()
-    ->build();
-
-$connectionSettings = $container->getConnectionSettings();
-$connection = new PDO(
-    $connectionSettings->dsn(),
-    $connectionSettings->user,
-    $connectionSettings->password
-);
-
-$result = $connection->query('SELECT COUNT(*) FROM catalog_product_entity');
-// Outputs 2040
-echo $result->fetch(PDO::FETCH_COLUMN);
-```
-
-### MariaDB container
-Everything the same as for MySQL container, just a different builder method
-
-```php
-use EcomDev\TestContainers\MagentoData\DbContainerBuilder;
-
-$container = DbContainerBuilder::mariadb()
-    ->withMagentoVersion('2.4.7-p2')
-    ->withSampleData()
-    ->build();
-```
-
-## OpenSearch container
-
-For OpenSearch container there is a different builder and container, that allows building base url for http connection
-
-Here is a small example
-
-```php
-use EcomDev\TestContainers\MagentoData\OpenSearchContainerBuilder;
-use GuzzleHttp\Client;
-
-$container = OpenSearchContainerBuilder::new()
-            ->withSampleData()
-            ->build();
-
-$client = new Client([
-    'base_uri' => $container->getBaseUrl()
-]);
-
-$result = json_decode(
-    $client->get('magento2_product_1/_count')->getBody()->getContents(),
-    true
-);
-
-// Outputs 181
-echo $result['count'];
+    assert_eq!(total, 2040);
+}
 ```
 
 ## 📜 License

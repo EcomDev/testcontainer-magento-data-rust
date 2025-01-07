@@ -4,17 +4,8 @@ env:
   MSRV: '1.81.0'
 on:
   push:
-    paths:
-      - testcontainers-magento-data-rust/**
-      - Cargo.toml
-      - Cargo.lock
-      - .github/workflows/rust-*
   pull_request:
-    paths:
-      - testcontainers-magento-data-rust/**
-      - Cargo.toml
-      - Cargo.lock
-      - .github/workflows/rust-*
+  workflow_call:
 jobs:
   check:
     runs-on: ubuntu-24.04
@@ -57,7 +48,7 @@ jobs:
         with:
           save-if: ${{ github.ref == 'refs/heads/main' }}
       - name: Run tests
-        run: cargo test --workspace --all-features --all-targets
+        run: cargo test --all-features --all-targets
 
   test-msrv:
     needs: check
@@ -87,5 +78,5 @@ jobs:
       - uses: EmbarkStudios/cargo-deny-action@v1
         with:
           command: check ${{ matrix.checks }}
-          manifest-path: ./testcontainers-magento-data-rust/Cargo.toml
+          manifest-path: ./Cargo.toml
           rust-version: ${{ env.MSRV }}
