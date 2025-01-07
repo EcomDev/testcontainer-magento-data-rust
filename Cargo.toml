@@ -1,6 +1,6 @@
 [package]
 name = "testcontainers-magento-data"
-description = ""
+description = "🐳 Test-Containers for Quick Magento Development"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
