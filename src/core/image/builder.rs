@@ -51,7 +51,7 @@ mod tests {
     }
 
     impl TestImage {
-        fn full_name(&self) -> Cow<str> {
+        fn full_name(&self) -> Cow<'_, str> {
             Cow::Borrowed(self.0.as_ref()) + Cow::Borrowed(":") + Cow::Borrowed(self.1.as_ref())
         }
     }
