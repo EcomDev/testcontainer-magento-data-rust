@@ -23,3 +23,26 @@ async fn starts_container_with_sample_data() {
 
     assert_eq!(total, 2040);
 }
+
+
+#[tokio::test]
+async fn starts_container_with_sample_data_from_mageos() {
+    let container = DbContainer::mysql()
+        .with_sample_data()
+        .with_distribution("mageos")
+        .with_version("3.4.0")
+        .start()
+        .await
+        .unwrap();
+
+    let connection = MySqlPool::connect(&container.connection_url().await.unwrap())
+        .await
+        .unwrap();
+
+    let total: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM catalog_product_entity")
+        .fetch_one(&connection)
+        .await
+        .unwrap();
+
+    assert_eq!(total, 2040);
+}

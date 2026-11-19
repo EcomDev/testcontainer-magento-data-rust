@@ -5,6 +5,7 @@ pub trait ImageBuilder: Sized {
     fn with_variation(self, variation: impl AsRef<str>) -> Self;
     fn with_version(self, version: impl AsRef<str>) -> Self;
     fn with_repository(self, repository: impl ImageRepository) -> Self;
+    fn with_distribution(self, distribution: impl AsRef<str>) -> Self;
 }
 
 pub trait ImageBuilderTarget: Sized {
@@ -31,6 +32,10 @@ where
     fn with_repository(self, repository: impl ImageRepository) -> Self {
         self.with_image_name(|name| name.with_repository(repository))
     }
+
+    fn with_distribution(self, distribution: impl AsRef<str>) -> Self {
+        self.with_image_name(|name| name.with_distribution(distribution.as_ref()))
+    }
 }
 
 #[cfg(test)]
@@ -54,6 +59,17 @@ mod tests {
         fn full_name(&self) -> Cow<'_, str> {
             Cow::Borrowed(self.0.as_ref()) + Cow::Borrowed(":") + Cow::Borrowed(self.1.as_ref())
         }
+    }
+
+    #[test]
+    fn allows_providing_custom_distribution() {
+        assert_eq!(
+            TestImage(ImageName::new("mysql"), ImageTag::default())
+                .with_sample_data()
+                .with_distribution("mageos")
+                .full_name(),
+            "ghcr.io/ecomdev/testcontainer-mageos-data/mysql:latest-sampledata",
+        );
     }
 
     #[test]
