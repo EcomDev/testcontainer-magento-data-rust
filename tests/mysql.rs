@@ -24,7 +24,6 @@ async fn starts_container_with_sample_data() {
     assert_eq!(total, 2040);
 }
 
-
 #[tokio::test]
 async fn starts_container_with_sample_data_from_mageos() {
     let container = DbContainer::mysql()

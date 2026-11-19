@@ -1,7 +1,7 @@
 use crate::core::{ImageBuilderTarget, ImageName, ImageTag};
 use std::borrow::Cow;
-use testcontainers::core::WaitFor;
 use testcontainers::Image;
+use testcontainers::core::WaitFor;
 
 pub struct OpenSearchContainer {
     image_name: ImageName,

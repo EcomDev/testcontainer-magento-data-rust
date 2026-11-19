@@ -1,4 +1,4 @@
-use crate::core::{ImageRepository, DEFAULT_IMAGE_REPOSITORY, DEFAULT_DISTRIBUTION};
+use crate::core::{DEFAULT_DISTRIBUTION, DEFAULT_IMAGE_REPOSITORY, ImageRepository};
 
 #[derive(Debug, PartialEq)]
 pub struct ImageName {
@@ -14,17 +14,12 @@ impl ImageName {
     }
 
     pub fn with_distribution(self, distribution: &str) -> Self {
-        let path = DEFAULT_IMAGE_REPOSITORY.image_path(
-            &self.name, distribution.as_ref()
-        );
+        let path = DEFAULT_IMAGE_REPOSITORY.image_path(&self.name, distribution.as_ref());
         Self { path, ..self }
     }
 
     pub fn with_repository(self, repository: impl ImageRepository) -> Self {
-        let path = repository.image_path(
-            &self.name,
-            DEFAULT_DISTRIBUTION
-        );
+        let path = repository.image_path(&self.name, DEFAULT_DISTRIBUTION);
         Self { path, ..self }
     }
 }

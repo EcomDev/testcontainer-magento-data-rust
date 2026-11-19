@@ -22,4 +22,3 @@ async fn starts_container_with_sample_data_from_mageos() {
         .await
         .unwrap();
 }
-
