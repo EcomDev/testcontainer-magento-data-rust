@@ -18,4 +18,4 @@ blocking = ["testcontainers/blocking"]
 watchdog = ["testcontainers/watchdog"]
 
 [dev-dependencies]
-sqlx = { version = "0.9.1", features = [ "runtime-tokio", "tls-rustls-ring-native-roots", "mysql" ] }
+sqlx = { version = "0.8.6", features = [ "runtime-tokio", "tls-rustls-ring-native-roots", "mysql" ] }
